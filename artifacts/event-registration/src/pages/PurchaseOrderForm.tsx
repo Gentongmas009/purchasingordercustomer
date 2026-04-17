@@ -68,6 +68,7 @@ function validate(form: FormData, items: OrderItem[]): string | null {
   }
   if (!form.salesPerson.trim()) return "Sales person wajib diisi";
   if (!form.metodePembayaran) return "Metode pembayaran wajib dipilih";
+  if (!form.keteranganPembayaran) return "Status pembayaran wajib dipilih";
   return null;
 }
 
@@ -439,12 +440,47 @@ export default function PurchaseOrderForm() {
             </div>
           </Field>
 
-          <Field icon={<FileText size={16}/>} label="Keterangan Pembayaran"
-            hint="Silahkan isi (opsional)"
-            hasValue={!!form.keteranganPembayaran} isFocused={!!focused.keteranganPembayaran} isTextarea>
-            <textarea className="po-input po-textarea" placeholder=" " value={form.keteranganPembayaran} rows={2}
-              onChange={e => set("keteranganPembayaran", e.target.value)}
-              onFocus={() => onFocus("keteranganPembayaran")} onBlur={() => onBlur("keteranganPembayaran")} />
+          {form.metodePembayaran === "Transfer" && (
+            <div className="po-transfer-box">
+              <div className="po-transfer-title">🏦 Informasi Rekening</div>
+              <p className="po-transfer-note">Silahkan lakukan pembayaran sebelum <strong>1×24 jam</strong> ke salah satu rekening berikut:</p>
+              <div className="po-transfer-list">
+                <div className="po-transfer-item">
+                  <span className="po-bank-name">BRI</span>
+                  <span className="po-bank-number">0262 01 000031 562</span>
+                  <span className="po-bank-owner">a.n. DIAN PURNAMA REZA T.</span>
+                </div>
+                <div className="po-transfer-item">
+                  <span className="po-bank-name">MANDIRI</span>
+                  <span className="po-bank-number">136 000 4780612</span>
+                  <span className="po-bank-owner">a.n. DIAN PURNAMA</span>
+                </div>
+                <div className="po-transfer-item">
+                  <span className="po-bank-name">BCA (GIRO)</span>
+                  <span className="po-bank-number">155 91 99999</span>
+                  <span className="po-bank-owner">a.n. INDARTO WIBOWO</span>
+                </div>
+                <div className="po-transfer-item">
+                  <span className="po-bank-name">BNI</span>
+                  <span className="po-bank-number">0822 705 836</span>
+                  <span className="po-bank-owner">a.n. INDARTO WIBOWO</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <Field icon={<FileText size={16}/>} label="Status Pembayaran" required hasValue={!!form.keteranganPembayaran} isFocused={!!focused.keteranganPembayaran}>
+            <div className="po-select-wrap">
+              <select className="po-input po-select" value={form.keteranganPembayaran}
+                onChange={e => set("keteranganPembayaran", e.target.value)}
+                onFocus={() => onFocus("keteranganPembayaran")} onBlur={() => onBlur("keteranganPembayaran")}>
+                <option value="" disabled />
+                <option value="Lunas">Lunas</option>
+                <option value="Dibayar Sebagian">Dibayar Sebagian</option>
+                <option value="COD">COD</option>
+              </select>
+              <ChevronDown size={14} className="po-select-arrow" />
+            </div>
           </Field>
 
           <button type="submit" disabled={submitting} className="po-btn">

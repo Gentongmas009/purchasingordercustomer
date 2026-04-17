@@ -101,6 +101,15 @@ router.post("/orders", async (req, res): Promise<void> => {
     whatsappSent:         "false",
   });
 
+  const infoRekening = d.metodePembayaran === "Transfer"
+    ? `\n🏦 *Rekening Pembayaran*\n` +
+      `Silahkan lakukan pembayaran sebelum *1×24 jam* ke salah satu rekening:\n\n` +
+      `• *BRI*\n  0262 01 000031 562\n  a.n. DIAN PURNAMA REZA T.\n\n` +
+      `• *MANDIRI*\n  136 000 4780612\n  a.n. DIAN PURNAMA\n\n` +
+      `• *BCA (GIRO)*\n  155 91 99999\n  a.n. INDARTO WIBOWO\n\n` +
+      `• *BNI*\n  0822 705 836\n  a.n. INDARTO WIBOWO\n`
+    : "";
+
   const pesanPelanggan =
     `📦 *INVOICE PESANAN* #${orderId}\n` +
     `━━━━━━━━━━━━━━━━━━━\n` +
@@ -117,7 +126,8 @@ router.post("/orders", async (req, res): Promise<void> => {
     `*Total   : Rp ${formatRupiah(total)}*\n\n` +
     `💳 *Pembayaran*\n` +
     `Metode  : ${d.metodePembayaran}\n` +
-    (d.keteranganPembayaran ? `Ket     : ${d.keteranganPembayaran}\n` : "") +
+    (d.keteranganPembayaran ? `Status  : ${d.keteranganPembayaran}\n` : "") +
+    infoRekening +
     `\n📍 *Pengiriman*\n` +
     `Alamat  : ${d.alamat}\n` +
     (d.patokanLokasi ? `Patokan : ${d.patokanLokasi}\n` : "") +
