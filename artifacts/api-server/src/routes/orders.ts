@@ -110,48 +110,42 @@ router.post("/orders", async (req, res): Promise<void> => {
       `• *BNI*\n  0822 705 836\n  a.n. INDARTO WIBOWO\n`
     : "";
 
+  const now = new Date();
+  const pad = (n: number) => String(n).padStart(2, "0");
+  const timestamp = `${pad(now.getDate())}/${pad(now.getMonth() + 1)}/${now.getFullYear()} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
   const pesanPelanggan =
-    `📦 *INVOICE PESANAN* #${orderId}\n` +
-    `━━━━━━━━━━━━━━━━━━━\n` +
-    `${namaToko}\n` +
-    `━━━━━━━━━━━━━━━━━━━\n\n` +
-    `Halo *${d.namaKontak}* 👋\n` +
-    `Terima kasih sudah memesan!\n` +
-    `Berikut detail pesanan kamu:\n\n` +
-    `🛒 *Detail Produk*\n` +
-    `Produk  : ${d.namaProduk}\n` +
-    `Jumlah  : ${d.jumlahProduk} unit\n` +
-    `Harga   : Rp ${formatRupiah(d.hargaProduk)}\n` +
-    (ongkir ? `Ongkir  : Rp ${formatRupiah(ongkir)}\n` : "") +
-    `*Total   : Rp ${formatRupiah(total)}*\n\n` +
-    `💳 *Pembayaran*\n` +
-    `Metode  : ${d.metodePembayaran}\n` +
-    (d.keteranganPembayaran ? `Status  : ${d.keteranganPembayaran}\n` : "") +
+    `Halo Kak 👋\n\n` +
+    `Terima kasih sudah mengisi form Purchase Order Customer 🙏\n\n` +
+    `Pesanan Kakak sudah kami terima dan saat ini sedang diproses oleh tim kami. Berikut ringkasan pesanan Kakak:\n\n` +
+    `📦 *Nama Produk:* ${d.namaProduk}\n` +
+    `🔢 *Jumlah:* ${d.jumlahProduk} unit\n` +
+    `💰 *Harga:* Rp ${formatRupiah(d.hargaProduk)}\n` +
+    (ongkir ? `🚚 *Ongkir:* Rp ${formatRupiah(ongkir)}\n` : "") +
+    `📍 *Alamat:* ${d.alamat}` + (d.patokanLokasi ? ` – ${d.patokanLokasi}` : "") + `\n\n` +
+    `💳 *Total Pembayaran: Rp ${formatRupiah(total)}*\n` +
     infoRekening +
-    `\n📍 *Pengiriman*\n` +
-    `Alamat  : ${d.alamat}\n` +
-    (d.patokanLokasi ? `Patokan : ${d.patokanLokasi}\n` : "") +
-    `\n━━━━━━━━━━━━━━━━━━━\n` +
-    `Pesanan sedang diproses. Terima kasih! 🙏`;
+    `\nUntuk melanjutkan pesanan, silakan lakukan pembayaran sesuai total di atas ya 🙏\n` +
+    `_(Setelah pembayaran, mohon kirim bukti transfer ke chat ini)_\n\n` +
+    `Jika ada pertanyaan, jangan ragu untuk menghubungi kami 😊\n\n` +
+    `Terima kasih atas kepercayaannya 🙌`;
 
   const pesanAdmin =
-    `🔔 *ORDER BARU!* #${orderId}\n` +
-    `━━━━━━━━━━━━━━━━━━━\n\n` +
-    `👤 *Data Pelanggan*\n` +
-    `Nama    : ${d.namaKontak}\n` +
-    `Telepon : ${d.nomorTelepon}\n` +
-    `Alamat  : ${d.alamat}\n` +
-    (d.patokanLokasi ? `Patokan : ${d.patokanLokasi}\n` : "") +
-    `\n🛒 *Detail Order*\n` +
-    `Produk  : ${d.namaProduk}\n` +
-    `Jumlah  : ${d.jumlahProduk} unit\n` +
-    `Harga   : Rp ${formatRupiah(d.hargaProduk)}\n` +
-    (ongkir ? `Ongkir  : Rp ${formatRupiah(ongkir)}\n` : "") +
-    `*Total   : Rp ${formatRupiah(total)}*\n\n` +
-    `💳 *Pembayaran*\n` +
-    `Metode  : ${d.metodePembayaran}\n` +
-    (d.keteranganPembayaran ? `Ket     : ${d.keteranganPembayaran}\n` : "") +
-    `\n🧑 Sales   : ${d.salesPerson}`;
+    `🔔 *Order masuk bossku!* 👀\n\n` +
+    `📌 *Customer:*\n` +
+    `${d.namaKontak} – ${d.nomorTelepon}\n\n` +
+    `📍 *Alamat:* ${d.alamat}\n` +
+    (d.patokanLokasi ? `🏠 *Patokan:* ${d.patokanLokasi}\n` : "") +
+    `\n📦 *Pesanan:*\n` +
+    `${d.namaProduk} x ${d.jumlahProduk} unit\n\n` +
+    `💰 *Total: Rp ${formatRupiah(total)}*` +
+    (ongkir ? ` (Ongkir: Rp ${formatRupiah(ongkir)})` : "") + `\n` +
+    (d.keteranganPembayaran ? `💳 Pembayaran: ${d.metodePembayaran} – ${d.keteranganPembayaran}\n` : `💳 Pembayaran: ${d.metodePembayaran}\n`) +
+    `\n👨‍💼 *Sales:* ${d.salesPerson}\n\n` +
+    `⚡ Yuk langsung di-follow up sebelum dia keburu cancel 😄\n\n` +
+    `🕒 ${timestamp}\n\n` +
+    `━━━━━━━━━━━━━━━━━━━\n` +
+    `✅ _Siap meluncur bossku!_ 🚀`;
 
   let whatsappSent = false;
 
