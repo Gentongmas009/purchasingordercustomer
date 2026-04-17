@@ -8,9 +8,48 @@
 import * as zod from "zod";
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * @summary Submit a purchase order
+ */
+export const SubmitOrderBody = zod.object({
+  namaKontak: zod.string(),
+  nomorTelepon: zod.string(),
+  alamat: zod.string(),
+  patokanLokasi: zod.string(),
+  namaProduk: zod.string(),
+  jumlahProduk: zod.number(),
+  hargaProduk: zod.number(),
+  biayaPengiriman: zod.number().nullish(),
+  salesPerson: zod.string(),
+  metodePembayaran: zod.enum(["CASH", "Debit", "Transfer"]),
+  keteranganPembayaran: zod.string().nullish(),
+});
+
+/**
+ * @summary List all orders
+ */
+export const ListOrdersResponseItem = zod.object({
+  id: zod.number(),
+  orderId: zod.string(),
+  namaKontak: zod.string(),
+  nomorTelepon: zod.string(),
+  alamat: zod.string(),
+  patokanLokasi: zod.string(),
+  namaProduk: zod.string(),
+  jumlahProduk: zod.number(),
+  hargaProduk: zod.number(),
+  biayaPengiriman: zod.number().nullish(),
+  totalHarga: zod.number(),
+  salesPerson: zod.string(),
+  metodePembayaran: zod.string(),
+  keteranganPembayaran: zod.string().nullish(),
+  whatsappSent: zod.string(),
+  createdAt: zod.string(),
+});
+export const ListOrdersResponse = zod.array(ListOrdersResponseItem);

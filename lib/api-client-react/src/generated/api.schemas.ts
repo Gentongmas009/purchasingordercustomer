@@ -8,3 +8,56 @@
 export interface HealthStatus {
   status: string;
 }
+
+export type SubmitOrderBodyMetodePembayaran =
+  (typeof SubmitOrderBodyMetodePembayaran)[keyof typeof SubmitOrderBodyMetodePembayaran];
+
+export const SubmitOrderBodyMetodePembayaran = {
+  CASH: "CASH",
+  Debit: "Debit",
+  Transfer: "Transfer",
+} as const;
+
+export interface SubmitOrderBody {
+  namaKontak: string;
+  nomorTelepon: string;
+  alamat: string;
+  patokanLokasi: string;
+  namaProduk: string;
+  jumlahProduk: number;
+  hargaProduk: number;
+  biayaPengiriman?: number | null;
+  salesPerson: string;
+  metodePembayaran: SubmitOrderBodyMetodePembayaran;
+  keteranganPembayaran?: string | null;
+}
+
+export interface SubmitOrderResponse {
+  success: boolean;
+  message: string;
+  orderId: string;
+  whatsappSent?: boolean;
+}
+
+export interface OrderItem {
+  id: number;
+  orderId: string;
+  namaKontak: string;
+  nomorTelepon: string;
+  alamat: string;
+  patokanLokasi: string;
+  namaProduk: string;
+  jumlahProduk: number;
+  hargaProduk: number;
+  biayaPengiriman?: number | null;
+  totalHarga: number;
+  salesPerson: string;
+  metodePembayaran: string;
+  keteranganPembayaran?: string | null;
+  whatsappSent: string;
+  createdAt: string;
+}
+
+export interface ErrorResponse {
+  error: string;
+}

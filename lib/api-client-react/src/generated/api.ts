@@ -5,18 +5,27 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  ErrorResponse,
+  HealthStatus,
+  OrderItem,
+  SubmitOrderBody,
+  SubmitOrderResponse,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -25,7 +34,6 @@ type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 /**
- * Returns server health status
  * @summary Health check
  */
 export const getHealthCheckUrl = () => {
@@ -92,6 +100,167 @@ export function useHealthCheck<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getHealthCheckQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Submit a purchase order
+ */
+export const getSubmitOrderUrl = () => {
+  return `/api/orders`;
+};
+
+export const submitOrder = async (
+  submitOrderBody: SubmitOrderBody,
+  options?: RequestInit,
+): Promise<SubmitOrderResponse> => {
+  return customFetch<SubmitOrderResponse>(getSubmitOrderUrl(), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(submitOrderBody),
+  });
+};
+
+export const getSubmitOrderMutationOptions = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitOrder>>,
+    TError,
+    { data: BodyType<SubmitOrderBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof submitOrder>>,
+  TError,
+  { data: BodyType<SubmitOrderBody> },
+  TContext
+> => {
+  const mutationKey = ["submitOrder"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof submitOrder>>,
+    { data: BodyType<SubmitOrderBody> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return submitOrder(data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SubmitOrderMutationResult = NonNullable<
+  Awaited<ReturnType<typeof submitOrder>>
+>;
+export type SubmitOrderMutationBody = BodyType<SubmitOrderBody>;
+export type SubmitOrderMutationError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Submit a purchase order
+ */
+export const useSubmitOrder = <
+  TError = ErrorType<ErrorResponse>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitOrder>>,
+    TError,
+    { data: BodyType<SubmitOrderBody> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof submitOrder>>,
+  TError,
+  { data: BodyType<SubmitOrderBody> },
+  TContext
+> => {
+  return useMutation(getSubmitOrderMutationOptions(options));
+};
+
+/**
+ * @summary List all orders
+ */
+export const getListOrdersUrl = () => {
+  return `/api/orders`;
+};
+
+export const listOrders = async (
+  options?: RequestInit,
+): Promise<OrderItem[]> => {
+  return customFetch<OrderItem[]>(getListOrdersUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListOrdersQueryKey = () => {
+  return [`/api/orders`] as const;
+};
+
+export const getListOrdersQueryOptions = <
+  TData = Awaited<ReturnType<typeof listOrders>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listOrders>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListOrdersQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listOrders>>> = ({
+    signal,
+  }) => listOrders({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listOrders>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListOrdersQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listOrders>>
+>;
+export type ListOrdersQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all orders
+ */
+
+export function useListOrders<
+  TData = Awaited<ReturnType<typeof listOrders>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listOrders>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListOrdersQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

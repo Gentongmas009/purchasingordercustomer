@@ -1,6 +1,5 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
   description: API specification
@@ -10,13 +9,14 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: orders
+    description: Purchase order operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +24,49 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+  /orders:
+    post:
+      operationId: submitOrder
+      tags: [orders]
+      summary: Submit a purchase order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitOrderBody"
+      responses:
+        "201":
+          description: Order submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SubmitOrderResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    get:
+      operationId: listOrders
+      tags: [orders]
+      summary: List all orders
+      responses:
+        "200":
+          description: List of orders
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OrderItem"
 components:
   schemas:
     HealthStatus:
@@ -33,4 +76,115 @@ components:
           type: string
       required:
         - status
-
+    SubmitOrderBody:
+      type: object
+      required:
+        - namaKontak
+        - nomorTelepon
+        - alamat
+        - patokanLokasi
+        - namaProduk
+        - jumlahProduk
+        - hargaProduk
+        - salesPerson
+        - metodePembayaran
+      properties:
+        namaKontak:
+          type: string
+        nomorTelepon:
+          type: string
+        alamat:
+          type: string
+        patokanLokasi:
+          type: string
+        namaProduk:
+          type: string
+        jumlahProduk:
+          type: number
+        hargaProduk:
+          type: number
+        biayaPengiriman:
+          type: number
+          nullable: true
+        salesPerson:
+          type: string
+        metodePembayaran:
+          type: string
+          enum: [CASH, Debit, Transfer]
+        keteranganPembayaran:
+          type: string
+          nullable: true
+    SubmitOrderResponse:
+      type: object
+      required:
+        - success
+        - message
+        - orderId
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        orderId:
+          type: string
+        whatsappSent:
+          type: boolean
+    OrderItem:
+      type: object
+      required:
+        - id
+        - orderId
+        - namaKontak
+        - nomorTelepon
+        - alamat
+        - patokanLokasi
+        - namaProduk
+        - jumlahProduk
+        - hargaProduk
+        - totalHarga
+        - salesPerson
+        - metodePembayaran
+        - whatsappSent
+        - createdAt
+      properties:
+        id:
+          type: integer
+        orderId:
+          type: string
+        namaKontak:
+          type: string
+        nomorTelepon:
+          type: string
+        alamat:
+          type: string
+        patokanLokasi:
+          type: string
+        namaProduk:
+          type: string
+        jumlahProduk:
+          type: integer
+        hargaProduk:
+          type: integer
+        biayaPengiriman:
+          type: integer
+          nullable: true
+        totalHarga:
+          type: integer
+        salesPerson:
+          type: string
+        metodePembayaran:
+          type: string
+        keteranganPembayaran:
+          type: string
+          nullable: true
+        whatsappSent:
+          type: string
+        createdAt:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
