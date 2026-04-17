@@ -21,14 +21,21 @@ function cleanPhoneNumber(raw: string): string | null {
   return null;
 }
 
-async function kirimWA(target: string, message: string): Promise<boolean> {
+async function kirimWA(
+  target: string,
+  message: string,
+  options: { button?: string; footer?: string } = {}
+): Promise<boolean> {
   const token = process.env.FONNTE_TOKEN;
   if (!token) {
     logger.warn("FONNTE_TOKEN not set, skipping WA notification");
     return false;
   }
   try {
-    const form = new URLSearchParams({ target, message });
+    const params: Record<string, string> = { target, message };
+    if (options.button)  params.button  = options.button;
+    if (options.footer)  params.footer  = options.footer;
+    const form = new URLSearchParams(params);
     const res = await fetch("https://api.fonnte.com/send", {
       method: "POST",
       headers: { Authorization: token, "Content-Type": "application/x-www-form-urlencoded" },
@@ -143,9 +150,7 @@ router.post("/orders", async (req, res): Promise<void> => {
     (d.keteranganPembayaran ? `💳 Pembayaran: ${d.metodePembayaran} – ${d.keteranganPembayaran}\n` : `💳 Pembayaran: ${d.metodePembayaran}\n`) +
     `\n👨‍💼 *Sales:* ${d.salesPerson}\n\n` +
     `⚡ Yuk langsung di-follow up sebelum dia keburu cancel 😄\n\n` +
-    `🕒 ${timestamp}\n\n` +
-    `━━━━━━━━━━━━━━━━━━━\n` +
-    `✅ _Siap meluncur bossku!_ 🚀`;
+    `🕒 ${timestamp}`;
 
   let whatsappSent = false;
 
@@ -156,7 +161,10 @@ router.post("/orders", async (req, res): Promise<void> => {
   }
 
   if (adminWA) {
-    await kirimWA(adminWA, pesanAdmin);
+    await kirimWA(adminWA, pesanAdmin, {
+      button: "✅ Siap meluncur bossku!,📞 Hubungi customer,⏳ Follow up nanti",
+      footer: `Order #${orderId} – ${d.salesPerson}`,
+    });
     whatsappSent = true;
   }
 
