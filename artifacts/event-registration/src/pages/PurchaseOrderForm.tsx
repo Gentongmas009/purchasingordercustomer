@@ -418,12 +418,23 @@ export default function PurchaseOrderForm() {
 
           <div className="po-section-title" style={{ marginTop: "24px" }}>💳 Pembayaran & Sales</div>
 
-          <Field icon={<UserCheck size={16}/>} label="Sales Person"
-            hint="Isi nama kamu agar admin tidak kebingungan saat menyerahkan invoice"
-            required hasValue={!!form.salesPerson} isFocused={!!focused.salesPerson}>
-            <input className="po-input" placeholder=" " value={form.salesPerson}
-              onChange={e => set("salesPerson", e.target.value)}
-              onFocus={() => onFocus("salesPerson")} onBlur={() => onBlur("salesPerson")} />
+          <Field icon={<UserCheck size={16}/>} label="Sales Person" required hasValue={!!form.salesPerson} isFocused={!!focused.salesPerson}>
+            <div className="po-select-wrap">
+              <select className="po-input po-select" value={form.salesPerson}
+                onChange={e => set("salesPerson", e.target.value)}
+                onFocus={() => onFocus("salesPerson")} onBlur={() => onBlur("salesPerson")}>
+                <option value="" disabled />
+                <option value="LEHAN">LEHAN</option>
+                <option value="PRIYANTO">PRIYANTO</option>
+                <option value="DHANI">DHANI</option>
+                <option value="AGUS">AGUS</option>
+                <option value="WIWIT">WIWIT</option>
+                <option value="IMAM">IMAM</option>
+                <option value="ANDRE">ANDRE</option>
+                <option value="AGUNG">AGUNG</option>
+              </select>
+              <ChevronDown size={14} className="po-select-arrow" />
+            </div>
           </Field>
 
           <Field icon={<CreditCard size={16}/>} label="Metode Pembayaran" required hasValue={!!form.metodePembayaran} isFocused={!!focused.metodePembayaran}>
