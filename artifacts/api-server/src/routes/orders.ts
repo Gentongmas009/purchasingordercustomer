@@ -227,4 +227,29 @@ router.post("/orders", async (req, res): Promise<void> => {
   });
 });
 
+// PATCH /orders/:id/pengiriman — update status pengiriman & driver
+router.patch("/orders/:id/pengiriman", async (req, res): Promise<void> => {
+  const id = Number(req.params.id);
+  const { statusPengiriman, driverName } = req.body as {
+    statusPengiriman?: string;
+    driverName?: string;
+  };
+
+  const validStatus = ["Menunggu", "Diproses", "Dikirim", "Selesai", "Dibatalkan"];
+  if (!statusPengiriman || !validStatus.includes(statusPengiriman)) {
+    res.status(400).json({ error: "Status tidak valid" });
+    return;
+  }
+
+  await db
+    .update(ordersTable)
+    .set({
+      statusPengiriman,
+      ...(driverName !== undefined ? { driverName } : {}),
+    })
+    .where(eq(ordersTable.id, id));
+
+  res.json({ ok: true });
+});
+
 export default router;
