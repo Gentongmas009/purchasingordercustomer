@@ -18,6 +18,8 @@ export const ordersTable = pgTable("orders", {
   metodePembayaran:     text("metode_pembayaran").notNull(),
   keteranganPembayaran: text("keterangan_pembayaran"),
   whatsappSent:         text("whatsapp_sent").default("false"),
+  statusPengiriman:     text("status_pengiriman").default("Menunggu").notNull(),
+  driverName:           text("driver_name"),
   createdAt:            timestamp("created_at").defaultNow().notNull(),
 });
 
